@@ -1,6 +1,7 @@
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { useEffect, useState } from "react";
 import { Alert, Button, Modal, Platform, Pressable, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from "react-native";
+import { exportPlantsBackup, importPlantsBackupMobil, importPlantsBackupWeb } from "./utils/backup";
 import { Plant } from "./utils/plants";
 import { loadData, saveData } from "./utils/storage";
 
@@ -141,9 +142,46 @@ export default function PlantScreen() {
         ]);
     };
 
+    const refresh = async () => {
+        const p = await loadData<Plant>("plants");
+        setPlants(p);
+    }
+
     return (
         <ScrollView style={styles.container}>
             <Text style={styles.title}>Mina växter </Text>
+
+            {/*Backup-knappar*/}
+            <View style={{gap: 8, marginBottom: 16}}>
+                <Button title="Exportera backup" onPress={() => exportPlantsBackup()} />
+
+                <Button 
+                   title="Importera backup"
+                   onPress={async () => {
+                    try {
+                        if (Platform.OS === "web") {
+                            const input = document.createElement("input");
+                            input.type = "file";
+                            input.accept = "application/json";
+                            input.onchange = async () => {
+                                const file = input.files?.[0];
+                                if (!file) return;
+                                await importPlantsBackupWeb(file);
+                                await refresh();
+                                Alert.alert("Klart", "Backup importerad");
+                            };
+                            input.click();
+                        } else {
+                            await importPlantsBackupMobil();
+                            await refresh();
+                            Alert.alert("Klart", "Backup importerad");
+                        }
+                    } catch (e: any) {
+                        Alert.alert("Fel", e?.message ?? "Import misslyckades");
+                    }
+                   }}   
+                />
+            </View>
 
             {/* Action-meny (Modal) - ligger här */}
             <Modal
@@ -172,16 +210,10 @@ export default function PlantScreen() {
                      onPress={handleDeleteSelected}
                   >
                     <Text
-                    style={[styles.sheetButtonText, styles.dangerText]}
-                    >
-                        Radera
-                    </Text>
+                    style={[styles.sheetButtonText, styles.dangerText]}>Radera</Text>
                 </Pressable>
 
-                <Pressable 
-                   style={styles.sheetCancel}
-                   onPress={() => setActionOpen(false)}
-                >
+                <Pressable style={styles.sheetCancel} onPress={() => setActionOpen(false)}>
                     <Text style={styles.sheetCancelText}>Avbryt</Text>
                 </Pressable>
               </View>
