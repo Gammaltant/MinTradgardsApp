@@ -6,6 +6,9 @@ import { Platform } from "react-native";
 import type { Plant } from "./plants";
 import { loadData, saveData } from "./storage";
 
+const KEY = "plants";
+const FILE_NAME = "plants-backup.json";
+
 //----------WEB-helpers--------//
 function downloadTextFile(filename: string, text: string) {
     const blob = new Blob([text], { type: "application/json"});
@@ -17,25 +20,35 @@ function downloadTextFile(filename: string, text: string) {
     URL.revokeObjectURL(url);
 }
 
+function assertPlantArray(parsed: unknown): asserts parsed is Plant[] {
+    if(!Array.isArray(parsed)) {
+        throw new Error("Backupfilen är inte en lista");
+        
+    }
+}
+
 export async function exportPlantsBackup() {
     const plants = await loadData<Plant>("plants");
     const json = JSON.stringify(plants, null, 2);
 
     //Web datorn//
     if ( Platform.OS === "web") {
-        downloadTextFile("plants-backup.json", json);
+        downloadTextFile(FILE_NAME, json);
         return;
     }
 
     //MOBIL
     const uri = (FileSystem as any).documentDirectory + "plant-backup.json";
-    await FileSystem.writeAsStringAsync(uri, json);
+    await FileSystem.writeAsStringAsync(uri, json, {
+        encoding: FileSystem.EncodingType.UTF8,
+    });
 
     if (await Sharing.isAvailableAsync()) {
         await Sharing.shareAsync(uri);
     }
 }
 
+//WEB: import via <Input type= "file" />
 export async function importPlantsBackupWeb(file: File) {
     const text = await file.text();
     const parsed = JSON.parse(text);
@@ -45,20 +58,27 @@ export async function importPlantsBackupWeb(file: File) {
     await saveData("plants", parsed as Plant[]);
 }
 
+//MOBIL: import via dokumentPicker
 export async function importPlantsBackupMobil() {
-    //MOBIL(expo go)
     const result = await DocumentPicker.getDocumentAsync({
         type: "application/json",
         copyToCacheDirectory: true,
+        multiple: false,
     });
 
-    if (result.canceled) return;
+    if (result.canceled) return 0;
 
     const uri = result.assets[0].uri;
-    const text = await FileSystem.readAsStringAsync(uri);
+    const text = await FileSystem.readAsStringAsync(uri, {
+        encoding: FileSystem.EncodingType.UTF8,
+    });
 
-    const parsed = JSON.parse(text);
-    if (!Array.isArray(parsed)) throw new Error("Backupfilen är inte en lista");
+    const parsed = JSON.parse(text) as unknown;
+    assertPlantArray(parsed);
 
-    await saveData("plants", parsed as Plant[]);
+    const plants = parsed as Plant[];
+
+    await saveData(KEY, plants);
+    return plants.length;
+    
 }

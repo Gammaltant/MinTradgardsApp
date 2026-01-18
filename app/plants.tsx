@@ -147,41 +147,33 @@ export default function PlantScreen() {
         setPlants(p);
     }
 
+    const handleImportBackup = async () => {
+        try {
+            if (Platform.OS === "web") {
+              const input = document.createElement("input");
+              input.type = "file";
+              input.accept = "application/json";
+              input.onchange = async () => {
+                  const file = input.files?.[0];
+                  if (!file) return;
+                  await importPlantsBackupWeb(file);
+                  await refresh();
+                  Alert.alert("Klart", "Backup importerad");
+              };
+              input.click();
+            } else {
+              await importPlantsBackupMobil();
+              await refresh();
+              Alert.alert ("Klart", "Backup importerad"); 
+            }
+        } catch (e: any) {
+            Alert.alert("Fel", e?.message ?? "Import misslyckades");
+        }
+    };
+
     return (
         <ScrollView style={styles.container}>
             <Text style={styles.title}>Mina växter </Text>
-
-            {/*Backup-knappar*/}
-            <View style={{gap: 8, marginBottom: 16}}>
-                <Button title="Exportera backup" onPress={() => exportPlantsBackup()} />
-
-                <Button 
-                   title="Importera backup"
-                   onPress={async () => {
-                    try {
-                        if (Platform.OS === "web") {
-                            const input = document.createElement("input");
-                            input.type = "file";
-                            input.accept = "application/json";
-                            input.onchange = async () => {
-                                const file = input.files?.[0];
-                                if (!file) return;
-                                await importPlantsBackupWeb(file);
-                                await refresh();
-                                Alert.alert("Klart", "Backup importerad");
-                            };
-                            input.click();
-                        } else {
-                            await importPlantsBackupMobil();
-                            await refresh();
-                            Alert.alert("Klart", "Backup importerad");
-                        }
-                    } catch (e: any) {
-                        Alert.alert("Fel", e?.message ?? "Import misslyckades");
-                    }
-                   }}   
-                />
-            </View>
 
             {/* Action-meny (Modal) - ligger här */}
             <Modal
@@ -282,6 +274,17 @@ export default function PlantScreen() {
             >
               <Text style={styles.addText}>+ Lägg till växt</Text>
              </TouchableOpacity>
+
+            {/*Backup-knappar*/}
+            <View style={styles.backupSection}>
+                <TouchableOpacity style={styles.backupButton} onPress={exportPlantsBackup}>
+                    <Text style={styles.backupButtonText}>Exportera backup</Text>
+                </TouchableOpacity>
+
+                <TouchableOpacity style={styles.backupButtonSecondary}>
+                    <Text style={styles.backupButtonText}>Importera backup</Text>
+                </TouchableOpacity>
+            </View>
            </ScrollView>
           );
         }
@@ -336,19 +339,57 @@ export default function PlantScreen() {
             addButton: {
                 backgroundColor: '#96A78D', 
                 borderRadius:10,
-                alignItems: 'center',
-                padding: 15, 
+                alignSelf: "center",
+                paddingVertical: 8,
+                paddingHorizontal: 30,
                 marginTop: 40,
                 marginBottom: 50,
             },
             addText: {
-                color: '#F0BB78', 
+                color: "#1B211A", 
                 fontSize: 18
+            },
+
+            backupSection: {
+                marginTop: 30,
+                marginBottom: 10,
+                alignItems: "center",
+                gap: 10,
+
+                flexDirection: Platform.OS === "web" ? "row" : "column",
+                justifyContent: "center",
+            },
+
+            backupButton: {
+                paddingVertical: 8,
+                paddingHorizontal: 18,
+                borderRadius: 10,
+                backgroundColor: "transparent",
+                borderWidth: 1,
+                borderColor:  "#3E4C37",
+                alignSelf: "center",
+            },
+
+            backupButtonSecondary:{
+                paddingVertical: 8,
+                paddingHorizontal: 18,
+                borderRadius: 10,
+                backgroundColor: "transparent",
+                borderWidth: 1,
+                borderColor:  "#3E4C37",
+                alignSelf: "center",
+            },
+
+            backupButtonText: {
+                color:  "#C9D7A5",
+                fontSize: 14,
+                fontWeight: "600",
             },
 
               label: {
                 fontWeight: "700",
                 marginBottom: 4,
+            
             },
             input: {
                 borderWidth: 1,
