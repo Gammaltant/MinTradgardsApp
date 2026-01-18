@@ -168,7 +168,6 @@ export default function PlantScreen() {
             }
         } catch (e: any) {
             Alert.alert("Fel", e?.message ?? "Import misslyckades");
-        }
     };
 
     return (
@@ -275,16 +274,17 @@ export default function PlantScreen() {
               <Text style={styles.addText}>+ Lägg till växt</Text>
              </TouchableOpacity>
 
-            {/*Backup-knappar*/}
-            <View style={styles.backupSection}>
-                <TouchableOpacity style={styles.backupButton} onPress={exportPlantsBackup}>
-                    <Text style={styles.backupButtonText}>Exportera backup</Text>
+
+             {/*Backup-knappar */}
+             <View style={styles.backupSection}>
+                <TouchableOpacity style={styles.backupBtn} onPress={exportPlantsBackup}>
+                    <Text style={styles.backupBtnText}>Exportera backup</Text>
                 </TouchableOpacity>
 
-                <TouchableOpacity style={styles.backupButtonSecondary}>
-                    <Text style={styles.backupButtonText}>Importera backup</Text>
+                <TouchableOpacity style={styles.backupBtnSecondary} onPress={handleImportBackup}>
+                    <Text style={styles.backupBtnText}>Importera backup</Text>
                 </TouchableOpacity>
-            </View>
+             </View>
            </ScrollView>
           );
         }
@@ -460,4 +460,31 @@ export default function PlantScreen() {
                 textAlign: "center",
                 color: "#aaa",
             },
+
+            backupBtn: {
+                paddingVertical: 8,
+                paddingHorizontal: 18,
+                borderRadius: 10,
+                backgroundColor:  "#273022",
+                borderWidth: 1,
+                borderColor: "#3E4C37",
+                alignSelf: "center",
+            },
+
+            backupBtnSecondary: {
+                paddingVertical: 8,
+                paddingHorizontal: 18,
+                borderRadius: 10,
+                backgroundColor: "#273022",
+                borderWidth: 1,
+                borderColor: "#3E4C37",
+                alignSelf: "center",
+            },
+
+            backupBtnText: {
+                color: "#C9D7A5",
+                fontSize: 14,
+                fontWeight: "600",
+            },
         });
+    }

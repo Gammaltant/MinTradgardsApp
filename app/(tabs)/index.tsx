@@ -7,19 +7,18 @@ export default function HomeScreen() {
 
   return (
     <View style={[styles.container, isWide ? styles.row : styles.column]}>
-
-      {/* Bild-del*/}
-      <View style={[styles.container, isWide ? styles.half : styles.full]}>
+      {/*Bild-del*/}
+      <View style={[styles.imageSection, isWide ? styles.half : styles.imageMobile]}>
         <Image 
-          source={require('@/assets/images/tradgard.png')}
+          source={require("@/assets/images/tradgard.png")}
           style={styles.image}
           resizeMode="cover"
           />
       </View>
 
-      {/* Text + knapp-del */}
-      <View style={[styles.contentSection, isWide ? styles.half : styles.full]}>
-        <Text style={styles.title}>Trädgårdsappen 🌿</Text>
+      {/* Text + knapp-del*/}
+      <View style={[styles.contentSection, isWide ? styles.half : styles.contentMobile]}>
+        <Text style={styles.title}>Trädgårdsappen🌿</Text>
         <Text style={styles.subtitle}>Din digitala trädgårdskompis</Text>
 
         <Link href="/menu" asChild>
@@ -27,7 +26,7 @@ export default function HomeScreen() {
             <Text style={styles.menuButtonText}>Börja här :)</Text>
           </TouchableOpacity>
         </Link>
-      </View>  
+      </View>
     </View>
   );
 }
@@ -78,6 +77,21 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
     marginBottom: 12,
     alignSelf: "center",
+
+  },
+
+  imageMobile: {
+    height: 260,
+    marginTop: 20,
+    marginBottom: 16,
+    borderRadius: 18,
+    overflow: "hidden",
+  },
+
+  contentMobile: {
+    paddingHorizontal: 20,
+    paddingBottom: 30,
+    alignItems: "center",
   },
 
   subtitle: {

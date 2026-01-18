@@ -81,7 +81,8 @@ export default function AddPlantScreen() {
                 <Text style={styles.label}>Namn</Text>
                 <TextInput 
                    style={styles.input}
-                   placeholder='Ex: Lavendel'
+                   placeholder="Ex: Lavendel/potatis/plommonträd"
+                   placeholderTextColor="#D9E9CF"
                    value={name}
                    onChangeText={(text) => {
                     setName(text);
@@ -122,15 +123,16 @@ const styles = StyleSheet.create({
     label: {
         fontSize: 16,
         marginTop: 10,
-        color: '#fff',
+        color: "#D9E9CF",
     },
     helperText: {
         marginTop: 10,
         color: '#aaa',
+        fontWeight: "bold",
     },
 
     input: {
-        backgroundColor: '#F0BB78',
+        backgroundColor: '#A4B465',
         color: '#000',
         borderWidth: 1,
         borderColor: '#aaa',
@@ -151,7 +153,7 @@ const styles = StyleSheet.create({
         color: '#000',
     },
     selectedButton: {
-        backgroundColor: '#cdeedb',
+        backgroundColor: "#A4B465",
         borderColor: '#57cc99',
     },
     saveButton: {
