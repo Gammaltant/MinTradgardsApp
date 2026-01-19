@@ -1,9 +1,13 @@
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { useEffect, useState } from "react";
 import { Alert, Button, Modal, Platform, Pressable, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from "react-native";
-import { exportPlantsBackup, importPlantsBackupMobil, importPlantsBackupWeb } from "./utils/backup";
-import { Plant } from "./utils/plants";
-import { loadData, saveData } from "./utils/storage";
+import { exportPlantsBackup, importPlantsBackupMobil, importPlantsBackupWeb } from "../utils/backup";
+import { getLatLon } from "../utils/location";
+import { Plant } from "../utils/plants";
+import { loadData, saveData } from "../utils/storage";
+import { fetchDailyWeather } from "../utils/weather";
+
+console.log("✅ plants.tsx renderar");
 
 export default function PlantScreen() {
     const router = useRouter();
@@ -16,6 +20,22 @@ export default function PlantScreen() {
     const [isEditing, setIsEditing] = useState(false);
 
     const selectedPlant =plants.find(p => p.id === selectedId) ?? null;
+
+    // TEST
+    useEffect(() => {
+        console.log("✅ useEffect körs i plants.tsx");
+
+        (async () => {
+          console.log("✅ startar location...");
+          const { lat, lon } = await getLatLon();
+          console.log("📍 lat/lon:", lat, lon);
+        
+          console.log("✅ hämtar väder...");
+          const daily = await fetchDailyWeather(lat, lon);
+          console.log("🌧️ regn:", daily.precipitation_sum);
+        })().catch((e) => console.log("❌ fel i väderflöde:", e));
+    },[]);
+
     
     // Ladda sparade växter när sidan öppnas
     useEffect(() => {
@@ -168,6 +188,7 @@ export default function PlantScreen() {
             }
         } catch (e: any) {
             Alert.alert("Fel", e?.message ?? "Import misslyckades");
+        }
     };
 
     return (
@@ -293,7 +314,7 @@ export default function PlantScreen() {
             container: {
                 flex: 1, 
                 padding: 20, 
-                backgroundColor: '#000'
+                backgroundColor: '#1B211A'
             },
           
             title: {
@@ -487,4 +508,4 @@ export default function PlantScreen() {
                 fontWeight: "600",
             },
         });
-    }
+    

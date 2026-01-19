@@ -1,8 +1,8 @@
 import { useRouter } from 'expo-router';
 import { useState } from 'react';
 import { StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
-import type { Plant } from "./utils/plants";
-import { loadData, saveData } from './utils/storage';
+import type { Plant } from "../utils/plants";
+import { loadData, saveData } from '../utils/storage';
 
 export default function AddPlantScreen() {
     const router = useRouter();

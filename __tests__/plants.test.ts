@@ -1,4 +1,4 @@
-import { addPlant, normalizeName, type Plant, plantExists, removePlant } from "../app/utils/plants";
+import { addPlant, normalizeName, type Plant, plantExists, removePlant } from "../utils/plants";
 
 function makePlant(overrides: Partial<Plant> = {}): Plant {
     return {
