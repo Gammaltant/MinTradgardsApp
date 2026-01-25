@@ -2,6 +2,7 @@ type DailyWeather = {
     time: string[];
     precipitation_sum: number[];
     temperature_2m_max: number[];
+    temperatur_2m_min: number[];
 };
 
 type OpenMeteoResponse = {
@@ -12,7 +13,7 @@ export async function fetchDailyWeather(lat: number, lon: number) {
     const params = new URLSearchParams({
         latitude: String(lat),
         longitude: String(lon),
-        daily: "precipitation_sum,temperature_2m_max",
+        daily: "precipitation_sum,temperature_2m_max,temperarure_2m_min",
         forecast_days: "10",
         timezone: "auto",
     })
@@ -41,8 +42,12 @@ export function daysSinceMeaningfulRain(
     return daily.precipitation_sum.length;
 }
 
-export function avgTempLastDays(daily: DailyWeather, n: number) {
-    const arr = daily.temperature_2m_max.slice(-n);
-    if (arr.length === 0) return 0;
-    return arr.reduce((a, b) => a + b, 0) / arr.length;
+export function avgTempLastDays(values: number[], n: number): number {
+    const arr = values.slice(-n);
+    if (arr.length === 0) {
+        return 0;
+}
+
+const sum = arr.reduce((total, value) => total + value, 0);
+return sum / arr.length;
 }
