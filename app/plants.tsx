@@ -12,6 +12,7 @@ console.log("✅ plants.tsx renderar");
 export default function PlantScreen() {
     const router = useRouter();
     const params = useLocalSearchParams();
+
     const [plants, setPlants] = useState<Plant[]>([]);
     const [selectedId, setSelectedId] = useState<string | null>(null);
     const [name, setName] = useState("");
@@ -19,6 +20,11 @@ export default function PlantScreen() {
     const [actionOpen, setActionOpen] = useState(false);
     const [isEditing, setIsEditing] = useState(false);
 
+    const groups = ["Alla", "Blommor", "Grönsaker", "Buskar/Träd", "Örter"] as const;
+    type GroupFilter = typeof groups[number];
+    const [filter, setFilter] = useState<GroupFilter>("Alla");
+
+    const visiblePlants = filter === "Alla" ? plants : plants.filter(p => p.group === filter);
     const selectedPlant =plants.find(p => p.id === selectedId) ?? null;
 
     // TEST
@@ -32,7 +38,13 @@ export default function PlantScreen() {
         
           console.log("✅ hämtar väder...");
           const daily = await fetchDailyWeather(lat, lon);
+          daily.time.forEach((date, i) => {
+            console.log(date, daily.precipitation_sum[i], "mm");
+          });
+
           console.log("🌧️ regn:", daily.precipitation_sum);
+          console.log("🌧️ regn mm (sträng):", JSON.stringify(daily.precipitation_sum));
+          console.log("🌧️ regn mm (join):", daily.precipitation_sum.join(", "));
         })().catch((e) => console.log("❌ fel i väderflöde:", e));
     },[]);
 
@@ -40,7 +52,7 @@ export default function PlantScreen() {
     // Ladda sparade växter när sidan öppnas
     useEffect(() => {
         async function fetchPlants() {
-            const stored = await loadData<Plant>("plants");
+            const stored = await loadData<Plant[]>("plants");
             setPlants(stored ?? []);
         }
         fetchPlants();
@@ -65,20 +77,19 @@ export default function PlantScreen() {
     const groupOrder: Record<string, number> = {
         "Blommor": 1,
         "Grönsaker": 2,
-        "Buskar/Träd": 3
+        "Buskar/Träd": 3,
+        "Örter": 4
     };
 
-    const sorted = [...plants].sort((a, b) => {
-        if (a.group !== b.group) {
-            return groupOrder[a.group] - groupOrder[b.group];
-        }
+    const sorted = [...visiblePlants].sort((a, b) => {
+        const ao = groupOrder[a.group] ?? 999;
+        const bo = groupOrder[b.group] ?? 999;
+        if (ao != bo) return ao - bo;
 
-        const nameCompare = a.name.localeCompare(b.name, "sv", {
-            sensitivity: "base",
-        });
+        const nameCompare = a.name.localeCompare(b.name, "sv", {sensitivity: "base",});
+        if (nameCompare !== 0) return nameCompare;
 
-        if (nameCompare !== 0) return nameCompare; 
-            return new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()
+        return new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()
     });
 
     function formatDate(date: string) {
@@ -124,6 +135,7 @@ export default function PlantScreen() {
             }
             : p
         );
+
         setPlants(updatedPlants);
         await saveData("plants", updatedPlants);
 
@@ -163,9 +175,9 @@ export default function PlantScreen() {
     };
 
     const refresh = async () => {
-        const p = await loadData<Plant>("plants");
-        setPlants(p);
-    }
+        const p = await loadData<Plant[]>("plants");
+        setPlants(p ?? []);
+    };
 
     const handleImportBackup = async () => {
         try {
@@ -194,6 +206,18 @@ export default function PlantScreen() {
     return (
         <ScrollView style={styles.container}>
             <Text style={styles.title}>Mina växter </Text>
+
+            <View style={styles.filterRow}>
+                {groups.map(g => (
+                    <TouchableOpacity
+                    key={g}
+                    onPress={() => setFilter(g)}
+                    style={[styles.filterChip, filter === g && styles.filterChipActive]}
+                    >
+                        <Text style={styles.filterChipText}>{g}</Text>
+                    </TouchableOpacity>
+                ))}
+            </View>
 
             {/* Action-meny (Modal) - ligger här */}
             <Modal
@@ -314,13 +338,38 @@ export default function PlantScreen() {
             container: {
                 flex: 1, 
                 padding: 20, 
-                backgroundColor: '#1B211A'
             },
           
             title: {
                 fontSize: 32, 
                 fontWeight: 'bold', 
                 marginBottom: 20,
+            },
+
+            filterRow: {
+                flexDirection: "row",
+                flexWrap: "wrap",
+                gap: 10,
+                marginBottom: 12,
+            },
+
+            filterChip: {
+                paddingVertical: 8,
+                paddingHorizontal: 12,
+                borderRadius: 999,
+                backgroundColor:  "#273022",
+                borderWidth: 1,
+                borderColor:  "#3E4C37",
+            },
+
+            filterChipActive: {
+                backgroundColor: "#A4B465",
+                borderColor:  "#A4B465",
+            },
+
+            filterChipText: {
+                color: "#fff",
+                fontWeight: "700",
             },
             empty: {
                 fontSize: 16, 

@@ -5,19 +5,30 @@ import 'react-native-reanimated';
 
 import { useColorScheme } from '@/hooks/use-color-scheme';
 
-export const unstable_settings = {
-  anchor: '(tabs)',
-};
-
 export default function RootLayout() {
   const colorScheme = useColorScheme();
 
   return (
     <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
-      <Stack>
+      <Stack
+      screenOptions={{
+        headerStyle: { backgroundColor: "#000" },
+        headerTintColor: "#fff",
+        contentStyle: { backgroundColor: "#1B211A"},
+      }}
+      >
+        {/* Tabs-delen; ingen header */}
         <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+
+        {/* Vanliga sidor: header på */}
+        <Stack.Screen name="menu" options={{ title: "Meny" }} />
+        <Stack.Screen name="plants" options={{ title: "Mina växter" }} />
+        <Stack.Screen name="todo" options={{ headerShown: false}} />
+
+        {/* Modal */}
         <Stack.Screen name="modal" options={{ presentation: 'modal', title: 'Modal' }} />
       </Stack>
+
       <StatusBar style="auto" />
     </ThemeProvider>
   );

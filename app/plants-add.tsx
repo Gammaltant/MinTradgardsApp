@@ -25,7 +25,7 @@ export default function AddPlantScreen() {
     const handleSave = async () => {
         if (!name.trim() || !group) return;
 
-        const existing = await loadData<Plant>("plants");
+        const existing = await loadData<Plant[]>("plants") ?? [];
         const trimmedName = name.trim();
         const normalizedName = trimmedName.toLowerCase();
 
@@ -113,7 +113,6 @@ const styles = StyleSheet.create({
     container: {
         flex: 1,
         padding: 20,
-        backgroundColor: '#000',
     },
     title: {
         fontSize: 32,

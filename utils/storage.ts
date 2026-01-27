@@ -1,6 +1,6 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
-export async function saveData<T>(key: string, data: T[]): Promise<void> {
+export async function saveData<T>(key: string, data: T): Promise<void> {
     try {
         await AsyncStorage.setItem(key, JSON.stringify(data));
     } catch (err) {
@@ -9,12 +9,12 @@ export async function saveData<T>(key: string, data: T[]): Promise<void> {
     }
 }
 
-export async function loadData<T>(key: string): Promise<T[]> {
+export async function loadData<T>(key: string): Promise<T | null> {
     try {
         const json = await AsyncStorage.getItem(key);
-        return json ? JSON.parse(json) : [];
+        return json ? (JSON.parse(json) as T) : null;
     } catch (err) {
         console.log("Load error", err);
-        return [];
+        return null;
     }
 }
