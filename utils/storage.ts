@@ -18,3 +18,8 @@ export async function loadData<T>(key: string): Promise<T | null> {
         return null;
     }
 }
+
+export async function loadArray<T>(key: string): Promise<T[]> {
+    const data = await loadData<T[]>(key);
+    return data ?? [];
+}

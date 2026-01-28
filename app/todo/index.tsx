@@ -1,9 +1,31 @@
+import { getLatLon } from "@/utils/location";
+import { isTaskDoneToday } from "@/utils/tasksDone";
+import { fetchDailyWeather, shouldWaterToday } from "@/utils/weather";
 import { Link } from "expo-router";
+import { useEffect, useState } from "react";
 import { Image, StyleSheet, Text, TouchableOpacity, useWindowDimensions, View } from "react-native";
 
 export default function TodoScreen() {
   const { width } = useWindowDimensions();
   const isWide = width >= 900; // web/desktop
+  const [needsWater, setNeedsWater] = useState(false);
+  const [waterDoneToday, setWaterDoneToday] = useState(false);
+
+  useEffect(() => {
+    async function load() {
+      try {
+        const done = await isTaskDoneToday("water");
+        setWaterDoneToday(done);
+
+        const { lat, lon } = await getLatLon();
+        const daily = await fetchDailyWeather(lat, lon);
+        setNeedsWater(shouldWaterToday(daily));
+      } catch (err) {
+        console.log("❌ Todo weather error:", err);
+      }
+    }
+    load();
+  }, []);
 
     return (
        <View style={[styles.container, isWide ? styles.row : styles.column]}>
@@ -14,6 +36,7 @@ export default function TodoScreen() {
           <Link href="/todo/water" asChild>
             <TouchableOpacity style={styles.button}>
               <Text style={styles.buttonText}>Vattna</Text>
+              {needsWater && !waterDoneToday && <View style={styles.badge} />}
             </TouchableOpacity>
           </Link>
 
@@ -119,5 +142,15 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: "bold",
     textAlign: "center",
+  },
+
+  badge: {
+    position: "absolute",
+    top: 8,
+    right: 12,
+    width: 10,
+    height: 10,
+    borderRadius: 5,
+    backgroundColor: "red",
   },
 });

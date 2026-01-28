@@ -1,4 +1,4 @@
-import { loadData, saveData } from "@/utils/storage";
+import { loadArray, loadData, saveData } from "@/utils/storage";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
 jest.mock("@react-native-async-storage/async-storage", () => ({
@@ -7,7 +7,7 @@ jest.mock("@react-native-async-storage/async-storage", () => ({
 }));
 
 it("Returnerar tom Array när ingent finns sparat", async () => {
-    const result = await loadData<any>("plants");
+    const result = await loadArray<any>("plants");
     expect(result).toEqual([]);
 });
 
@@ -25,14 +25,14 @@ it("Sparar och laddar växter", async () => {
 });
 
 it("Returnerar tom Array för okänd key", async () => {
-    const result = await loadData<any>("does-not-exist");
+    const result = await loadArray<any>("does-not-exist");
     expect(result).toEqual([]);
 });
 
-it("Returnerar [] när AsyncStorage kastar fel", async () => {
+it("Returnerar null när AsyncStorage kastar fel", async () => {
     (AsyncStorage.getItem as jest.Mock).mockRejectedValueOnce(new Error("Storage error"));
     
-    await expect(loadData<any>("plants")).resolves.toEqual([]);
+    await expect(loadData<any>("plants")).resolves.toBeNull();
 });
 
 it("Returnerar data när Async storage innehåller JSON", async () => {
@@ -40,6 +40,6 @@ it("Returnerar data när Async storage innehåller JSON", async () => {
         JSON.stringify([{ name: "Tomat", group: "Grönsaker"}])
     );
 
-    const result = await loadData<any>("plants");
+    const result = await loadArray<any>("plants");
     expect(result).toEqual([{ name: "Tomat", group: "Grönsaker"}]);
 })
