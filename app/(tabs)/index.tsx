@@ -1,25 +1,27 @@
-import { Link } from 'expo-router';
-import { Image, StyleSheet, Text, TouchableOpacity, View, useWindowDimensions } from 'react-native';
+import { Link } from "expo-router";
+import { Image, StyleSheet, Text, TouchableOpacity, View, useWindowDimensions } from "react-native";
 
 export default function HomeScreen() {
   const { width } = useWindowDimensions();
-  const isWide = width >= 900; // web/desktop
+  const isWide = width >= 900;
 
   return (
     <View style={[styles.container, isWide ? styles.row : styles.column]}>
-      {/*Bild-del*/}
+      {/* Bild-del */}
       <View style={[styles.imageSection, isWide ? styles.half : styles.imageMobile]}>
-        <Image 
+        <Image
           source={require("@/assets/images/tradgard.png")}
           style={styles.image}
           resizeMode="cover"
-          />
+        />
       </View>
 
-      {/* Text + knapp-del*/}
+      {/* Text + knapp-del */}
       <View style={[styles.contentSection, isWide ? styles.half : styles.contentMobile]}>
         <Text style={styles.title}>Trädgårdsappen🌿</Text>
-        <Text style={styles.subtitle}>Din digitala trädgårdskompis</Text>
+
+        {/* Subtitle bara på web/desktop */}
+        {isWide && <Text style={styles.subtitle}>Din digitala trädgårdskompis</Text>}
 
         <Link href="/menu" asChild>
           <TouchableOpacity style={styles.menuButton}>
@@ -32,14 +34,9 @@ export default function HomeScreen() {
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: "#1B211A"
-  },
+  container: { flex: 1, backgroundColor: "#1B211A" },
 
-  row: {
-    flexDirection: "row",
-  },
+  row: { flexDirection: "row" },
 
   column: {
     flexDirection: "column",
@@ -47,22 +44,30 @@ const styles = StyleSheet.create({
     padding: 20,
   },
 
-  half: {
+  half: { 
     flex: 1,
   },
 
-  full: {
-    width: "100%",
-  },
-
   imageSection: {
-    justifyContent: "center",
-    alignItems: "center",
+    flex: 1,
+    overflow: "hidden",
   },
 
-  image: {
+  imageMobile: {
+    height: 220,
     width: "100%",
-    height: "100%",
+    marginTop: 12,
+    marginBottom: 16,
+    borderRadius: 18,
+    overflow: "hidden",
+  },
+
+  image: { 
+    width: "100%", 
+    height: "100%", 
+    borderRadius: 14,
+    marginTop: 12,
+    marginBottom: 30,
   },
 
   contentSection: {
@@ -71,39 +76,30 @@ const styles = StyleSheet.create({
     paddingVertical: 24,
   },
 
-  title: {
-    fontSize: 50,
-    color: "#A4B465",
-    fontWeight: "bold",
-    marginBottom: 12,
-    alignSelf: "center",
-
-  },
-
-  imageMobile: {
-    height: 260,
-    marginTop: 20,
-    marginBottom: 16,
-    borderRadius: 18,
-    overflow: "hidden",
-  },
-
   contentMobile: {
     paddingHorizontal: 20,
-    paddingBottom: 30,
+    paddingBottom: 20,
     alignItems: "center",
   },
 
+  title: {
+    fontSize: 44,
+    color: "#A4B465",
+    fontWeight: "bold",
+    marginBottom: 10,
+    textAlign: "center",
+  },
+
   subtitle: {
-    fontSize: 22,
-    color: '#F0A04B',
-    marginBottom: 50,
-    maxWidth: 420,
+    fontSize: 20,
+    color: "#F0A04B",
+    marginBottom: 22,
+    maxWidth: 320,
     alignSelf: "center",
   },
 
   menuButton: {
-    backgroundColor: '#A4B465',
+    backgroundColor: "#A4B465",
     paddingVertical: 16,
     paddingHorizontal: 28,
     borderRadius: 12,
@@ -111,8 +107,8 @@ const styles = StyleSheet.create({
   },
 
   menuButtonText: {
-    color: '#fff',
+    color: "#fff",
     fontSize: 18,
-    fontWeight: 'bold',
+    fontWeight: "bold",
   },
 });

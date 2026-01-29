@@ -67,8 +67,16 @@ return sum / arr.length;
 export function shouldWaterToday(daily: DailyWeather) {
     const daysDry = daysSinceMeaningfulRain(daily, 3);
     const avgMaxTemp = avgTempLastDays(daily.temperature_2m_max, 3);
+    const lastMinTemp = daily.temperature_2m_min.at(-1) ?? 0;
 
+    // Skydd: vattna inte om det är för kallt
+    if (avgMaxTemp <= 5) return false;
+    if (lastMinTemp <= 0) return false;
+
+    // Torrt läge -> vattna
     if (daysDry >= 3) return true;
+
+    // Varmt + lite torrt -> vattna tidigare
     if (avgMaxTemp >= 22 && daysDry >= 2) return true;
 
     return false;
