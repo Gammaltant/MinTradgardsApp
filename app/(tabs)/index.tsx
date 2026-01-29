@@ -67,7 +67,6 @@ const styles = StyleSheet.create({
     height: "100%", 
     borderRadius: 14,
     marginTop: 12,
-    marginBottom: 30,
   },
 
   contentSection: {
